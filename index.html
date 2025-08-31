@@ -1,180 +1,408 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ESign Website</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ESign & Certificates</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      margin: 0;
-      padding: 0;
+    :root{
+      --bg:#f5f5f7;
+      --card:#fff;
+      --muted:#666;
+      --accent:#007aff;
+      --nav:#000;
+      --btn:#333;
     }
-    header {
-      background: #007BFF;
-      color: white;
-      padding: 15px;
-      text-align: center;
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0b0b0c;
+        --card:#151517;
+        --muted:#bbb;
+        --accent:#0a84ff;
+        --nav:#000;
+        --btn:#222;
+      }
     }
-    nav {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      background: #eee;
-      padding: 10px;
-    }
-    nav button {
-      padding: 10px 20px;
-      border: none;
-      background: #007BFF;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.3s;
-    }
-    nav button:hover {
-      background: #0056b3;
-    }
-    .page {
-      display: none;
-      padding: 20px;
-    }
-    .active {
-      display: block;
-    }
-    .accordion {
-      max-width: 700px;
-      margin: 20px auto;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    .accordion-item {
-      border-bottom: 1px solid #ddd;
-    }
-    .accordion-header {
-      width: 100%;
-      padding: 12px;
-      font-size: 15px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      background: #f1f1f1;
-      border: none;
-      outline: none;
-      transition: background 0.3s;
-    }
-    .accordion-header:hover {
-      background: #e2e2e2;
-    }
-    .accordion-img {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    .accordion-body {
-      max-height: 0;
-      overflow: hidden;
-      background: #fff;
-      transition: max-height 0.4s ease, padding 0.3s ease;
-      padding: 0 15px;
-    }
-    .accordion-body.open {
-      padding: 10px 15px;
-    }
-    .accordion-body a {
-      color: #007BFF;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .accordion-body a:hover {
-      text-decoration: underline;
+
+    /* Base */
+    html,body{height:100%;margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--muted);-webkit-font-smoothing:antialiased}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Nav */
+    nav{position:sticky;top:0;z-index:20;background:var(--nav);display:flex;justify-content:center;gap:12px;padding:12px;box-shadow:0 1px 0 rgba(0,0,0,0.08)}
+    nav button{background:var(--btn);color:#fff;border:0;padding:10px 18px;border-radius:18px;cursor:pointer;transition:transform .22s ease,box-shadow .22s ease,background .22s}
+    nav button:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,0.18)}
+    nav button:active{transform:translateY(0)}
+
+    /* Pages */
+    .container{max-width:900px;margin:28px auto;padding:0 16px}
+    .page{display:none;opacity:0;transform:translateY(18px);transition:opacity .45s ease,transform .45s ease}
+    .page.active{display:block;opacity:1;transform:translateY(0)}
+    h2{color:var(--muted);margin:8px 0 14px}
+
+    /* Accordion list */
+    .accordion{margin:0}
+    .accordion-item{background:var(--card);border-radius:10px;margin:12px 0;overflow:hidden;border:1px solid rgba(0,0,0,0.06);box-shadow:0 6px 18px rgba(0,0,0,0.04);transition:box-shadow .25s ease,border .25s}
+    .accordion-header{width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;background:transparent;border:0;cursor:pointer;font-weight:600;color:var(--muted);font-size:15px;position:relative}
+    .accordion-header:hover{background:rgba(0,0,0,0.02)}
+    .acct-left{display:flex;align-items:center;gap:12px}
+    .acct-img{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0}
+    .acct-title{line-height:1}
+    .acct-sub{font-size:13px;color:var(--muted);opacity:.85}
+
+    .acct-arrow{margin-left:auto;transition:transform .28s cubic-bezier(.2,.9,.2,1);color:var(--muted)}
+
+    .accordion-body{max-height:0;overflow:hidden;padding:0 16px;opacity:0;transition:max-height .48s cubic-bezier(.2,.9,.2,1),opacity .35s ease,padding .28s ease}
+    .accordion-body.open{max-height:420px;padding:12px 16px;opacity:1}
+
+    .download-btn{display:inline-block;background:linear-gradient(180deg,rgba(0,0,0,0.03),transparent);padding:10px 14px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);color:var(--accent);font-weight:700}
+    .download-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+    /* small screens */
+    @media (max-width:520px){
+      nav{padding:10px}
+      .accordion-header{padding:12px}
+      .acct-img{width:28px;height:28px}
+      .download-btn{padding:8px 12px}
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>ESign Website</h1>
-  </header>
-
   <nav>
     <button onclick="showPage('home')">Home</button>
     <button onclick="showPage('esign')">ESign App</button>
     <button onclick="showPage('cert')">Certificates</button>
+    <button onclick="showPage('dns')">DNS</button>
   </nav>
 
-  <!-- Trang chính -->
-  <div id="home" class="page active">
-    <h2>Welcome</h2>
-    <p>Chọn trang bạn muốn truy cập ở menu trên.</p>
-  </div>
-
-  <!-- Trang ESign App -->
-  <div id="esign" class="page">
-    <h2>ESign App</h2>
-    <div class="accordion">
-
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">ESign ✅ GLOBAL TAKEOFF, INC</button><div class="accordion-body"><a href="https://authtool.app/app-store/QWclbgzuwo" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">ESign Tianjin University of Commerce</button><div class="accordion-body"><a href="https://authtool.app/app-store/qXP3O3B6Uz" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">ESign BMW Brilliance Automotive Ltd</button><div class="accordion-body"><a href="https://authtool.app/app-store/7OqxDPVpw3" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">ESign VIETNAM JOINT STOCK COMMERCIAL BANK FOR INDUSTRY AND TRADE</button><div class="accordion-body"><a href="https://authtool.app/app-store/ZIorJs2LAG" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">ESign VIETTEL GROUP</button><div class="accordion-body"><a href="https://authtool.app/app-store/TeAGKeeN2U" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">ESign CHIBA INSTITUTE OF TECHNOLOGY</button><div class="accordion-body"><a href="https://authtool.app/app-store/AKaZs3fFEw" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">ESign Beijing Esensoft Co., Ltd</button><div class="accordion-body"><a href="https://authtool.app/app-store/dSxZpamYgC" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">ESign NREH ESTATE INFORMATION TECHNOLOGY CO.,LTD</button><div class="accordion-body"><a href="https://authtool.app/app-store/AhYoj6EyAB" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">ESign China Railway Eryuan Engineering Group Co., Ltd.</button><div class="accordion-body"><a href="https://authtool.app/app-store/GIiU5WnlfU" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">ESign EEO Education ltd</button><div class="accordion-body"><a href="https://authtool.app/app-store/CIQ9r5HkSy" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">ESign TCL household Appliance Marketing Co., LTD</button><div class="accordion-body"><a href="https://authtool.app/app-store/a2bulh1WYy" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">ESign Wuling Power Corporation</button><div class="accordion-body"><a href="https://authtool.app/app-store/iQcmyA0SG9" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">ESign GAC TOYOTA MOTOR CO.,LTD</button><div class="accordion-body"><a href="https://authtool.app/app-store/DZqt13Bmy4" target="_blank">Tải về</a></div></div>
-
+  <div class="container">
+    <!-- HOME -->
+    <div id="home" class="page active">
+      <h2>Welcome</h2>
+      <p style="color:var(--muted);max-width:760px">Chào mừng! Dùng menu trên để chuyển đến <strong>ESign App</strong>, <strong>Certificates</strong> hoặc <strong>DNS</strong>. Các mục mở ra với animation mượt; nhấn nút download sẽ mở link trong tab mới.</p>
     </div>
-  </div>
 
-  <!-- Trang Certificates -->
-  <div id="cert" class="page">
-    <h2>Certificates</h2>
-    <div class="accordion">
+    <!-- ESign App (13 mục) -->
+    <div id="esign" class="page">
+      <h2>ESign App</h2>
+      <div class="accordion" id="accordion-esign">
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">ESign ✅ GLOBAL TAKEOFF, INC</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://authtool.app/app-store/QWclbgzuwo" target="_blank" rel="noopener">Download</a>
+            </div>
+          </div>
+        </div>
 
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">GLOBAL TAKEOFF, INC</button><div class="accordion-body"><a href="https://www.mediafire.com/file/pxu30hm6tsqsqd4/GLOBAL+TAKEOFF,+INC.esigncert/file" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">GAC TOYOTA MOTOR CO.,LTD</button><div class="accordion-body"><a href="https://www.mediafire.com/file/9b4ktynm9no4uqo/GAC+TOYOTA+MOTOR+CO.,LTD.esigncert/file" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">Beijing Esensoft Co., Ltd</button><div class="accordion-body"><a href="https://www.mediafire.com/file/zd2ec5xzz9lv67k/Beijing+Esensoft+Co.,+Ltd..esigncert/file" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">NREH ESTATE INFORMATION TECHNOLOGY CO.,LTD</button><div class="accordion-body"><a href="https://www.mediafire.com/file/4n6pab1nfvgobvq/NREH+ESTATE+INFORMATION+TECHNOLOGY+CO.,LTD..esigncert/file" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">Tianjin University of Commerce</button><div class="accordion-body"><a href="https://www.mediafire.com/file/nl6vzz0j35kvq56/Tianjin+University+of+Commerce.esigncert/file" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">TCL household Appliance Marketing Co., LTD</button><div class="accordion-body"><a href="https://www.mediafire.com/file/j9rxvg5b1z85t9f/TCL+household+Appliance+Marketing+Co.,+LTD.esigncert/file" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">CHIBA INSTITUTE OF TECHNOLOGY</button><div class="accordion-body"><a href="https://www.mediafire.com/file/g7whuq4k3uge1ja/CHIBA+INSTITUTE+OF+TECHNOLOGY.esigncert/file" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">Wuling Power Corporation</button><div class="accordion-body"><a href="https://www.mediafire.com/file/w2d38fawjgw0dsj/Wuling+Power+Corporation.esigncert/file" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">VIETTEL GROUP</button><div class="accordion-body"><a href="https://www.mediafire.com/file/x5b8vz08prf624f/VIETTEL+GROUP.esigncert/file" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">China Railway Eryuan Engineering Group Co., Ltd.</button><div class="accordion-body"><a href="https://www.mediafire.com/file/kbz79zy9djxv0lr/China+Railway+Eryuan+Engineering+Group+Co.,+Ltd..esigncert/file" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">EEO Education Ltd</button><div class="accordion-body"><a href="https://www.mediafire.com/file/86b31d28cbo3847/EEO+Education+Ltd..esigncert/file" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">Beijing Esensoft Co., Ltd (Alt)</button><div class="accordion-body"><a href="https://www.mediafire.com/file/zd2ec5xzz9lv67k/Beijing_Esensoft_Co.%252C_Ltd..esigncert/file" target="_blank">Tải về</a></div></div>
-      <div class="accordion-item"><button class="accordion-header"><img src="https://khoindvn.io.vn/img/pf/profile-pic.png" class="accordion-img">BMW Brilliance Automotive Ltd</button><div class="accordion-body"><a href="https://www.mediafire.com/file/ohp96evewbmsycy/BMW_Brilliance_Automotive_Ltd..esigncert/file" target="_blank">Tải về</a></div></div>
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">ESign Tianjin University of Commerce</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://authtool.app/app-store/qXP3O3B6Uz" target="_blank" rel="noopener">Download</a>
+            </div>
+          </div>
+        </div>
 
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">ESign BMW Brilliance Automotive Ltd</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://authtool.app/app-store/7OqxDPVpw3" target="_blank" rel="noopener">Download</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">ESign VIETNAM JOINT STOCK COMMERCIAL BANK FOR INDUSTRY AND TRADE</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://authtool.app/app-store/ZIorJs2LAG" target="_blank" rel="noopener">Download</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">ESign VIETTEL GROUP</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://authtool.app/app-store/TeAGKeeN2U" target="_blank" rel="noopener">Download</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">ESign CHIBA INSTITUTE OF TECHNOLOGY</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://authtool.app/app-store/AKaZs3fFEw" target="_blank" rel="noopener">Download</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">ESign Beijing Esensoft Co., Ltd</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://authtool.app/app-store/dSxZpamYgC" target="_blank" rel="noopener">Download</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">ESign NREH ESTATE INFORMATION TECHNOLOGY CO.,LTD</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://authtool.app/app-store/AhYoj6EyAB" target="_blank" rel="noopener">Download</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">ESign China Railway Eryuan Engineering Group Co., Ltd.</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://authtool.app/app-store/GIiU5WnlfU" target="_blank" rel="noopener">Download</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">ESign EEO Education ltd</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://authtool.app/app-store/CIQ9r5HkSy" target="_blank" rel="noopener">Download</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">ESign TCL household Appliance Marketing Co., LTD</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://authtool.app/app-store/a2bulh1WYy" target="_blank" rel="noopener">Download</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">ESign Wuling Power Corporation</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://authtool.app/app-store/iQcmyA0SG9" target="_blank" rel="noopener">Download</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">ESign GAC TOYOTA MOTOR CO.,LTD</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://authtool.app/app-store/DZqt13Bmy4" target="_blank" rel="noopener">Download</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CERTIFICATES (13 mục) -->
+    <div id="cert" class="page">
+      <h2>Certificates</h2>
+      <div class="accordion" id="accordion-cert">
+        <div class="accordion-item"><button class="accordion-header"><div class="acct-left"><img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png"><div class="acct-title">GLOBAL TAKEOFF, INC</div></div><div class="acct-arrow">▶</div></button><div class="accordion-body"><div class="download-row"><a class="download-btn" href="https://www.mediafire.com/file/pxu30hm6tsqsqd4/GLOBAL+TAKEOFF,+INC.esigncert/file" target="_blank" rel="noopener">Download</a></div></div></div>
+
+        <div class="accordion-item"><button class="accordion-header"><div class="acct-left"><img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png"><div class="acct-title">GAC TOYOTA MOTOR CO.,LTD</div></div><div class="acct-arrow">▶</div></button><div class="accordion-body"><div class="download-row"><a class="download-btn" href="https://www.mediafire.com/file/9b4ktynm9no4uqo/GAC+TOYOTA+MOTOR+CO.,LTD.esigncert/file" target="_blank" rel="noopener">Download</a></div></div></div>
+
+        <div class="accordion-item"><button class="accordion-header"><div class="acct-left"><img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png"><div class="acct-title">Beijing Esensoft Co., Ltd.</div></div><div class="acct-arrow">▶</div></button><div class="accordion-body"><div class="download-row"><a class="download-btn" href="https://www.mediafire.com/file/zd2ec5xzz9lv67k/Beijing+Esensoft+Co.,+Ltd..esigncert/file" target="_blank" rel="noopener">Download</a></div></div></div>
+
+        <div class="accordion-item"><button class="accordion-header"><div class="acct-left"><img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png"><div class="acct-title">NREH ESTATE INFORMATION TECHNOLOGY CO.,LTD</div></div><div class="acct-arrow">▶</div></button><div class="accordion-body"><div class="download-row"><a class="download-btn" href="https://www.mediafire.com/file/4n6pab1nfvgobvq/NREH+ESTATE+INFORMATION+TECHNOLOGY+CO.,LTD..esigncert/file" target="_blank" rel="noopener">Download</a></div></div></div>
+
+        <div class="accordion-item"><button class="accordion-header"><div class="acct-left"><img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png"><div class="acct-title">Tianjin University of Commerce</div></div><div class="acct-arrow">▶</div></button><div class="accordion-body"><div class="download-row"><a class="download-btn" href="https://www.mediafire.com/file/nl6vzz0j35kvq56/Tianjin+University+of+Commerce.esigncert/file" target="_blank" rel="noopener">Download</a></div></div></div>
+
+        <div class="accordion-item"><button class="accordion-header"><div class="acct-left"><img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png"><div class="acct-title">TCL household Appliance Marketing Co., LTD</div></div><div class="acct-arrow">▶</div></button><div class="accordion-body"><div class="download-row"><a class="download-btn" href="https://www.mediafire.com/file/j9rxvg5b1z85t9f/TCL+household+Appliance+Marketing+Co.,+LTD.esigncert/file" target="_blank" rel="noopener">Download</a></div></div></div>
+
+        <div class="accordion-item"><button class="accordion-header"><div class="acct-left"><img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png"><div class="acct-title">CHIBA INSTITUTE OF TECHNOLOGY</div></div><div class="acct-arrow">▶</div></button><div class="accordion-body"><div class="download-row"><a class="download-btn" href="https://www.mediafire.com/file/g7whuq4k3uge1ja/CHIBA+INSTITUTE+OF+TECHNOLOGY.esigncert/file" target="_blank" rel="noopener">Download</a></div></div></div>
+
+        <div class="accordion-item"><button class="accordion-header"><div class="acct-left"><img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png"><div class="acct-title">Wuling Power Corporation</div></div><div class="acct-arrow">▶</div></button><div class="accordion-body"><div class="download-row"><a class="download-btn" href="https://www.mediafire.com/file/w2d38fawjgw0dsj/Wuling+Power+Corporation.esigncert/file" target="_blank" rel="noopener">Download</a></div></div></div>
+
+        <div class="accordion-item"><button class="accordion-header"><div class="acct-left"><img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png"><div class="acct-title">VIETTEL GROUP</div></div><div class="acct-arrow">▶</div></button><div class="accordion-body"><div class="download-row"><a class="download-btn" href="https://www.mediafire.com/file/x5b8vz08prf624f/VIETTEL+GROUP.esigncert/file" target="_blank" rel="noopener">Download</a></div></div></div>
+
+        <div class="accordion-item"><button class="accordion-header"><div class="acct-left"><img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png"><div class="acct-title">China Railway Eryuan Engineering Group Co., Ltd.</div></div><div class="acct-arrow">▶</div></button><div class="accordion-body"><div class="download-row"><a class="download-btn" href="https://www.mediafire.com/file/kbz79zy9djxv0lr/China+Railway+Eryuan+Engineering+Group+Co.,+Ltd..esigncert/file" target="_blank" rel="noopener">Download</a></div></div></div>
+
+        <div class="accordion-item"><button class="accordion-header"><div class="acct-left"><img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png"><div class="acct-title">EEO Education Ltd.</div></div><div class="acct-arrow">▶</div></button><div class="accordion-body"><div class="download-row"><a class="download-btn" href="https://www.mediafire.com/file/86b31d28cbo3847/EEO+Education+Ltd..esigncert/file" target="_blank" rel="noopener">Download</a></div></div></div>
+
+        <div class="accordion-item"><button class="accordion-header"><div class="acct-left"><img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png"><div class="acct-title">Beijing Esensoft Co., Ltd (Alt)</div></div><div class="acct-arrow">▶</div></button><div class="accordion-body"><div class="download-row"><a class="download-btn" href="https://www.mediafire.com/file/zd2ec5xzz9lv67k/Beijing_Esensoft_Co.%252C_Ltd..esigncert/file" target="_blank" rel="noopener">Download</a></div></div></div>
+
+        <div class="accordion-item"><button class="accordion-header"><div class="acct-left"><img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png"><div class="acct-title">BMW Brilliance Automotive Ltd.</div></div><div class="acct-arrow">▶</div></button><div class="accordion-body"><div class="download-row"><a class="download-btn" href="https://www.mediafire.com/file/ohp96evewbmsycy/BMW_Brilliance_Automotive_Ltd..esigncert/file" target="_blank" rel="noopener">Download</a></div></div></div>
+      </div>
+    </div>
+
+    <!-- DNS (1 mục) -->
+    <div id="dns" class="page">
+      <h2>DNS</h2>
+      <div class="accordion" id="accordion-dns">
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <div class="acct-left">
+              <img class="acct-img" src="https://khoindvn.io.vn/img/pf/profile-pic.png" alt="">
+              <div class="acct-title">Install DNS Profile</div>
+            </div>
+            <div class="acct-arrow">▶</div>
+          </button>
+          <div class="accordion-body">
+            <div class="download-row">
+              <a class="download-btn" href="https://tinyurl.com/5py6ts5a" target="_blank" rel="noopener">Tải về DNS Profile</a>
+            </div>
+            <p style="margin-top:10px;color:var(--muted);font-size:13px">Mở file trên thiết bị (iPhone/iPad) để cài DNS profile.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    function showPage(id) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-
-    document.querySelectorAll(".accordion-header").forEach((header) => {
-      header.addEventListener("click", () => {
-        let body = header.nextElementSibling;
-        if (body.style.maxHeight) {
-          body.style.maxHeight = null;
-          body.classList.remove("open");
+    // Page switching (smooth)
+    function showPage(id){
+      const pages = document.querySelectorAll('.page');
+      pages.forEach(p => {
+        if(p.id === id){
+          p.style.display = 'block';
+          // allow DOM paint then add active for animation
+          requestAnimationFrame(()=> requestAnimationFrame(()=> p.classList.add('active')));
         } else {
-          body.style.maxHeight = body.scrollHeight + "px";
-          body.classList.add("open");
+          p.classList.remove('active');
+          // hide after animation
+          setTimeout(()=>{ if(!p.classList.contains('active')) p.style.display='none'; }, 500);
         }
       });
+      // close any open accordion when switching
+      document.querySelectorAll('.accordion-body.open').forEach(b => {
+        b.classList.remove('open');
+        const hdr = b.previousElementSibling;
+        if(hdr) hdr.classList.remove('active');
+      });
+    }
+
+    // Accordion behavior: only one open at a time
+    document.addEventListener('click', (e)=>{
+      const hdr = e.target.closest('.accordion-header');
+      if(!hdr) return;
+      const body = hdr.nextElementSibling;
+      if(!body) return;
+
+      // close others in same page area
+      const parentAccordion = hdr.closest('.accordion');
+      parentAccordion.querySelectorAll('.accordion-body.open').forEach(b=>{
+        if(b !== body) {
+          b.classList.remove('open');
+          if(b.previousElementSibling) b.previousElementSibling.classList.remove('active');
+        }
+      });
+
+      // toggle current
+      const willOpen = !body.classList.contains('open');
+      if(willOpen){
+        body.classList.add('open');
+        hdr.classList.add('active');
+      } else {
+        body.classList.remove('open');
+        hdr.classList.remove('active');
+      }
     });
+
+    // Accessibility: open first ESign item on load (optional)
+    // document.addEventListener('DOMContentLoaded', ()=> {
+    //   const first = document.querySelector('#accordion-esign .accordion-item .accordion-header');
+    //   if(first) first.click();
+    // });
+
+    // Optional: deep-link via hash (e.g., #cert)
+    (function(){
+      const hash = location.hash.replace('#','');
+      if(hash){
+        const el = document.getElementById(hash);
+        if(el) showPage(hash);
+      }
+    })();
   </script>
 </body>
 </html>
